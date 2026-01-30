@@ -28,8 +28,8 @@ export default function GeneratorForm() {
   const selectedBg = useMemo(() => BACKGROUNDS.find(b => b.value === background)!, [background]);
   const selectedColor = useMemo(() => COLOR_PRESETS.find(c => c.value === colorPreset)!, [colorPreset]);
 
- const imagePrompts = useMemo(() => {
-  return buildImagePrompts({
+ const prompt = useMemo(() => {
+  return buildPrompt({
     format,
     occasion,
     theme,
@@ -43,6 +43,7 @@ export default function GeneratorForm() {
     extraNotes
   });
 }, [format, occasion, theme, background, font, colorPreset, topics, audience, pages, size, extraNotes]);
+
 
 
   async function onGenerate() {
@@ -200,7 +201,12 @@ export default function GeneratorForm() {
             <button
               type="button"
               className="rounded-lg px-4 py-2 border border-neutral-300 hover:bg-neutral-50"
-              onClick={() => navigator.clipboard.writeText(prompt)}
+             onClick={() =>
+  navigator.clipboard.writeText(
+    `COVER PROMPT:\n${imagePrompts.coverPrompt}\n\nINTERIOR BACKGROUND PROMPT:\n${imagePrompts.interiorPrompt}\n\nICON PROMPT:\n${imagePrompts.iconsPrompt}`
+  )
+}
+
             >
               Copy Prompt
             </button>
@@ -242,10 +248,21 @@ export default function GeneratorForm() {
               <span className="font-medium">Topics:</span> {topics.join(", ")}
             </div>
 
-            <div className="rounded-lg border border-neutral-200 bg-white p-3">
-              <div className="text-xs font-semibold mb-2">Generated Prompt</div>
-              <pre className="whitespace-pre-wrap text-xs leading-relaxed">{prompt}</pre>
-            </div>
+           <div className="rounded-lg border border-neutral-200 bg-white p-3">
+  <div className="text-xs font-semibold mb-2">Cover Image Prompt</div>
+  <pre className="whitespace-pre-wrap text-xs">{imagePrompts.coverPrompt}</pre>
+</div>
+
+<div className="rounded-lg border border-neutral-200 bg-white p-3">
+  <div className="text-xs font-semibold mb-2">Interior Background Prompt</div>
+  <pre className="whitespace-pre-wrap text-xs">{imagePrompts.interiorPrompt}</pre>
+</div>
+
+<div className="rounded-lg border border-neutral-200 bg-white p-3">
+  <div className="text-xs font-semibold mb-2">Icon / Sticker Prompt</div>
+  <pre className="whitespace-pre-wrap text-xs">{imagePrompts.iconsPrompt}</pre>
+</div>
+
 
             {mode === "generate" && (
               <div className="rounded-lg border border-neutral-200 bg-white p-3">
