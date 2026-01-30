@@ -24,11 +24,12 @@ function backgroundDesc(bg: string) {
 }
 
 function themeStyle(theme: string) {
-  if (theme === "Boho") return "boho minimalist aesthetic, soft organic shapes, neutral textures";
-  if (theme === "Floral") return "minimal floral line art, soft botanical accents";
-  if (theme === "Luxury") return "luxury minimalist aesthetic, elegant spacing, subtle gold-style accents";
-  if (theme === "Cute") return "cute minimal aesthetic, rounded shapes, friendly soft style";
-  if (theme === "Modern") return "modern clean aesthetic, geometric accents, crisp lines";
+  const t = theme.toLowerCase();
+  if (t.includes("boho")) return "boho minimalist aesthetic, soft organic shapes, neutral textures, airy spacing";
+  if (t.includes("floral")) return "minimal floral line art, soft botanical accents, delicate stems and petals";
+  if (t.includes("luxury")) return "luxury minimalist aesthetic, elegant spacing, subtle gold-style accents (printed look)";
+  if (t.includes("cute")) return "cute minimal aesthetic, rounded shapes, friendly soft style, simple doodle accents";
+  if (t.includes("modern")) return "modern clean aesthetic, geometric accents, crisp lines, minimal layout";
   return "minimal clean aesthetic with lots of white space";
 }
 
@@ -48,14 +49,14 @@ function fontStyle(font: string) {
 
 export function buildImagePrompts(input: PromptInput) {
   const coverPrompt = `
-Create a high-resolution PRINTABLE planner cover design.
+Create a high-resolution PRINTABLE planner/journal FRONT COVER design.
 
 STYLE:
 ${themeStyle(input.theme)}
 Color palette: ${colorPalette(input.colorPreset)}
 Typography style: ${fontStyle(input.font)}
 
-CONTENT:
+DETAILS:
 Planner type: ${input.format}
 Occasion: ${input.occasion}
 Audience: ${input.audience}
@@ -90,11 +91,11 @@ RULES:
 - Extremely subtle (must not affect readability)
 - No text, no words, no icons
 - Seamless / tileable pattern
-- Optimized for printing
+- Optimized for printing (minimal ink)
 `.trim();
 
   const iconsPrompt = `
-Create a cohesive set of 24 minimal planner icons.
+Create a cohesive set of 24 minimal planner icons/stickers.
 
 STYLE:
 ${themeStyle(input.theme)}
@@ -109,7 +110,7 @@ RULES:
 - Flat vector line icons
 - Consistent stroke width
 - No text, no branding, no watermark
-- Transparent background preferred
+- Transparent background preferred (or white background)
 `.trim();
 
   return {
