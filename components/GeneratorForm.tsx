@@ -73,12 +73,20 @@ export default function GeneratorForm() {
   const accent = selectedColor.accent;
 
   return (
-    <div className="grid gap-6 md:grid-cols-2">
-      {/* LEFT: FORM */}
-      <div className="rounded-xl border border-neutral-200 p-4 md:p-5">
-        <div className="flex items-center justify-between gap-2">
-          <h2 className="font-semibold">Customize</h2>
-          <div className="flex items-center gap-2 text-xs">
+   <div className="rounded-lg border border-neutral-200 bg-white p-3">
+  <div className="text-xs font-semibold mb-2">Cover Image Prompt</div>
+  <pre className="whitespace-pre-wrap text-xs">{imagePrompts.coverPrompt}</pre>
+</div>
+
+<div className="rounded-lg border border-neutral-200 bg-white p-3">
+  <div className="text-xs font-semibold mb-2">Interior Background Prompt</div>
+  <pre className="whitespace-pre-wrap text-xs">{imagePrompts.interiorPrompt}</pre>
+</div>
+
+<div className="rounded-lg border border-neutral-200 bg-white p-3">
+  <div className="text-xs font-semibold mb-2">Icon / Sticker Prompt</div>
+  <pre className="whitespace-pre-wrap text-xs">{imagePrompts.iconsPrompt}</pre>
+</div>
             <button
               className={`px-3 py-1 rounded-full border ${mode === "prompt" ? "bg-neutral-900 text-white border-neutral-900" : "border-neutral-300"}`}
               onClick={() => setMode("prompt")}
