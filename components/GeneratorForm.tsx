@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import PreviewCard from "./PreviewCard";
-import { buildPrompt } from "@/lib/prompt";
+import { buildImagePrompts } from "@/lib/prompt";
 import { BACKGROUNDS, COLOR_PRESETS, FONT_PRESETS, FORMAT_PRESETS, OCCASIONS, THEMES, TOPIC_SUGGESTIONS } from "@/lib/presets";
 
 export default function GeneratorForm() {
