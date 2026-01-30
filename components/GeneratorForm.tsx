@@ -28,8 +28,8 @@ export default function GeneratorForm() {
   const selectedBg = useMemo(() => BACKGROUNDS.find(b => b.value === background)!, [background]);
   const selectedColor = useMemo(() => COLOR_PRESETS.find(c => c.value === colorPreset)!, [colorPreset]);
 
- const prompt = useMemo(() => {
-  return buildPrompt({
+ const imagePrompts = useMemo(() => {
+  return buildPlannerDesignImagePrompts({
     format,
     occasion,
     theme,
