@@ -1,284 +1,196 @@
-"use client";
+type PromptInput = {
+  format: string;          // Daily Planner, Weekly Planner, etc.
+  occasion: string;        // Self-Care, Business, Wedding...
+  theme: string;           // Minimal, Boho, Floral...
+  background: string;      // plain, grid, dots, lines
+  font: string;            // inter, playfair, space
+  colorPreset: string;     // neutral, lavender, tealGold...
+  topics: string[];        // Gratitude, Goals...
+  audience: string;        // Adults, Teens...
+  pages: number;           // reference only
+  size: "Letter" | "A4" | "A5";
+  extraNotes: string;      // user notes
+};
 
-import { useMemo, useState } from "react";
-import PreviewCard from "./PreviewCard";
-import { buildImagePrompts } from "@/lib/prompt";
-import {
-  BACKGROUNDS,
-  COLOR_PRESETS,
-  FONT_PRESETS,
-  FORMAT_PRESETS,
-  OCCASIONS,
-  THEMES,
-  TOPIC_SUGGESTIONS
-} from "@/lib/presets";
-
-export default function GeneratorForm() {
-  const [font, setFont] = useState(FONT_PRESETS[0].value);
-  const [format, setFormat] = useState(FORMAT_PRESETS[0].value);
-  const [occasion, setOccasion] = useState(OCCASIONS[0].value);
-  const [theme, setTheme] = useState(THEMES[0].value);
-  const [background, setBackground] = useState(BACKGROUNDS[0].value);
-  const [colorPreset, setColorPreset] = useState(COLOR_PRESETS[0].value);
-
-  const [topics, setTopics] = useState<string[]>(["Gratitude", "Goals"]);
-  const [audience, setAudience] = useState("Adults");
-  const [pages, setPages] = useState(30);
-  const [size, setSize] = useState<"Letter" | "A4" | "A5">("Letter");
-  const [extraNotes, setExtraNotes] = useState("");
-
-  const selectedFont = useMemo(() => FONT_PRESETS.find((f) => f.value === font)!, [font]);
-  const selectedBg = useMemo(() => BACKGROUNDS.find((b) => b.value === background)!, [background]);
-  const selectedColor = useMemo(() => COLOR_PRESETS.find((c) => c.value === colorPreset)!, [colorPreset]);
-
-  const imagePrompts = useMemo(() => {
-    return buildImagePrompts({
-      format,
-      occasion,
-      theme,
-      background,
-      font,
-      colorPreset,
-      topics,
-      audience,
-      pages,
-      size,
-      extraNotes
-    });
-  }, [format, occasion, theme, background, font, colorPreset, topics, audience, pages, size, extraNotes]);
-
-  function toggleTopic(t: string) {
-    setTopics((prev) => (prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t]));
-  }
-
-  const bgStyle = `bg-pattern ${selectedBg.className}`;
-  const fontClass = selectedFont.className;
-  const accent = selectedColor.accent;
-
-  function copyAll() {
-    const text =
-      `COVER PROMPT:\n${imagePrompts.coverPrompt}\n\n` +
-      `INTERIOR BACKGROUND PROMPT:\n${imagePrompts.interiorPrompt}\n\n` +
-      `ICONS/STICKERS PROMPT:\n${imagePrompts.iconsPrompt}\n`;
-    navigator.clipboard.writeText(text);
-  }
-
-  return (
-    <div className="grid gap-6 md:grid-cols-2">
-      {/* LEFT: FORM */}
-      <div className="rounded-xl border border-neutral-200 p-4 md:p-5">
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <h2 className="font-semibold">Customize</h2>
-            <p className="text-xs text-neutral-500 mt-1">
-              This app generates visual image prompts based on your selections (cover + background + icons).
-            </p>
-          </div>
-        </div>
-
-        <div className="grid gap-3 mt-4">
-          <Field label="Format">
-            <select
-              className="w-full border rounded-lg p-2"
-              value={format}
-              onChange={(e) => setFormat(e.target.value)}
-            >
-              {FORMAT_PRESETS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          </Field>
-
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Occasion">
-              <select
-                className="w-full border rounded-lg p-2"
-                value={occasion}
-                onChange={(e) => setOccasion(e.target.value)}
-              >
-                {OCCASIONS.map((o) => (
-                  <option key={o.value} value={o.value}>
-                    {o.label}
-                  </option>
-                ))}
-              </select>
-            </Field>
-
-            <Field label="Theme">
-              <select
-                className="w-full border rounded-lg p-2"
-                value={theme}
-                onChange={(e) => setTheme(e.target.value)}
-              >
-                {THEMES.map((o) => (
-                  <option key={o.value} value={o.value}>
-                    {o.label}
-                  </option>
-                ))}
-              </select>
-            </Field>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Font">
-              <select className="w-full border rounded-lg p-2" value={font} onChange={(e) => setFont(e.target.value)}>
-                {FONT_PRESETS.map((o) => (
-                  <option key={o.value} value={o.value}>
-                    {o.label}
-                  </option>
-                ))}
-              </select>
-            </Field>
-
-            <Field label="Background">
-              <select
-                className="w-full border rounded-lg p-2"
-                value={background}
-                onChange={(e) => setBackground(e.target.value)}
-              >
-                {BACKGROUNDS.map((o) => (
-                  <option key={o.value} value={o.value}>
-                    {o.label}
-                  </option>
-                ))}
-              </select>
-            </Field>
-          </div>
-
-          <Field label="Color Preset">
-            <select
-              className="w-full border rounded-lg p-2"
-              value={colorPreset}
-              onChange={(e) => setColorPreset(e.target.value)}
-            >
-              {COLOR_PRESETS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          </Field>
-
-          <div className="grid grid-cols-3 gap-3">
-            <Field label="Pages (for reference)">
-              <input
-                className="w-full border rounded-lg p-2"
-                type="number"
-                min={5}
-                max={365}
-                value={pages}
-                onChange={(e) => setPages(parseInt(e.target.value || "30", 10))}
-              />
-            </Field>
-
-            <Field label="Size">
-              <select className="w-full border rounded-lg p-2" value={size} onChange={(e) => setSize(e.target.value as any)}>
-                {["Letter", "A4", "A5"].map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
-            </Field>
-
-            <Field label="Audience">
-              <input className="w-full border rounded-lg p-2" value={audience} onChange={(e) => setAudience(e.target.value)} />
-            </Field>
-          </div>
-
-          <div>
-            <div className="text-sm font-medium">Topics</div>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {TOPIC_SUGGESTIONS.map((t) => {
-                const active = topics.includes(t);
-                return (
-                  <button
-                    key={t}
-                    type="button"
-                    onClick={() => toggleTopic(t)}
-                    className={`px-3 py-1 rounded-full border text-xs ${
-                      active ? "bg-neutral-900 text-white border-neutral-900" : "border-neutral-300"
-                    }`}
-                  >
-                    {t}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <Field label="Extra Notes (optional)">
-            <textarea
-              className="w-full border rounded-lg p-2 min-h-[90px]"
-              value={extraNotes}
-              onChange={(e) => setExtraNotes(e.target.value)}
-              placeholder="Example: add subtle leaf doodles; keep very minimal; no busy textures."
-            />
-          </Field>
-
-          <div className="flex gap-2">
-            <button
-              type="button"
-              className="rounded-lg px-4 py-2 border border-neutral-300 hover:bg-neutral-50"
-              onClick={copyAll}
-            >
-              Copy Image Prompts
-            </button>
-          </div>
-
-          <div className="text-xs text-neutral-500">
-            Use these prompts in Midjourney, DALL·E, ImageFX, Leonardo, Canva AI, etc.
-          </div>
-        </div>
-      </div>
-
-      {/* RIGHT: PREVIEW */}
-      <div className="grid gap-4">
-        <PreviewCard
-          title="Live Preview"
-          subtitle="Visual image prompts based on your selections"
-          fontClass={fontClass}
-          bgStyle={bgStyle}
-          accent={accent}
-        >
-          <div className="space-y-3">
-            <div className="text-sm">
-              <span className="font-medium">Style:</span>{" "}
-              {format} • {occasion} • {theme} • {size} • {pages} pages
-            </div>
-
-            <div className="text-xs text-neutral-600">
-              <span className="font-medium">Topics:</span> {topics.join(", ")}
-            </div>
-
-            <div className="rounded-lg border border-neutral-200 bg-white p-3">
-              <div className="text-xs font-semibold mb-2">Cover Image Prompt</div>
-              <pre className="whitespace-pre-wrap text-xs leading-relaxed">{imagePrompts.coverPrompt}</pre>
-            </div>
-
-            <div className="rounded-lg border border-neutral-200 bg-white p-3">
-              <div className="text-xs font-semibold mb-2">Interior Background Prompt</div>
-              <pre className="whitespace-pre-wrap text-xs leading-relaxed">{imagePrompts.interiorPrompt}</pre>
-            </div>
-
-            <div className="rounded-lg border border-neutral-200 bg-white p-3">
-              <div className="text-xs font-semibold mb-2">Icons / Stickers Prompt</div>
-              <pre className="whitespace-pre-wrap text-xs leading-relaxed">{imagePrompts.iconsPrompt}</pre>
-            </div>
-          </div>
-        </PreviewCard>
-      </div>
-    </div>
-  );
+function list(items: string[]) {
+  return items.length ? items.join(", ") : "general productivity and wellness";
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <label className="grid gap-1">
-      <span className="text-sm font-medium">{label}</span>
-      {children}
-    </label>
-  );
+function backgroundDesc(bg: string) {
+  if (bg === "grid") return "subtle light gray grid paper (very faint, print-friendly)";
+  if (bg === "dots") return "subtle dotted paper (very faint, print-friendly)";
+  if (bg === "lines") return "subtle ruled lines (very faint, print-friendly)";
+  return "clean plain white paper (print-friendly)";
+}
+
+function themeStyle(theme: string) {
+  const t = theme.toLowerCase();
+  if (t.includes("boho")) return "boho minimalist aesthetic, soft organic shapes, warm neutral textures, airy spacing";
+  if (t.includes("floral")) return "minimal floral line art, delicate botanical accents, lots of white space";
+  if (t.includes("luxury")) return "luxury minimal aesthetic, elegant spacing, subtle gold-foil style accents (printed look, not metallic)";
+  if (t.includes("cute")) return "cute clean aesthetic, rounded shapes, simple doodles, friendly minimal icons";
+  if (t.includes("modern")) return "modern clean aesthetic, geometric accents, crisp thin lines";
+  return "minimal clean aesthetic with lots of white space";
+}
+
+function colorPalette(color: string) {
+  if (color === "lavender") return "lavender, soft lilac, white, light gray, charcoal text";
+  if (color === "tealGold") return "teal, warm cream, subtle gold accents, charcoal text";
+  if (color === "rose") return "rose, blush, white, light gray, charcoal text";
+  if (color === "forest") return "forest green, sage, warm cream, charcoal text";
+  return "black, white, light gray neutral palette";
+}
+
+function fontVibe(font: string) {
+  if (font === "playfair") return "typography vibe: elegant serif headings + clean sans-serif body text";
+  if (font === "space") return "typography vibe: modern geometric headings + clean sans-serif body text";
+  return "typography vibe: clean modern sans-serif typography";
+}
+
+function sizeSpec(size: "Letter" | "A4" | "A5") {
+  if (size === "A4") return "A4 portrait ratio";
+  if (size === "A5") return "A5 portrait ratio";
+  return "US Letter portrait ratio";
+}
+
+function notesBlock(extraNotes: string) {
+  const n = extraNotes?.trim();
+  return n ? `\nEXTRA NOTES:\n- ${n}\n` : "";
+}
+
+/**
+ * These prompts are designed to be pasted into:
+ * Midjourney / DALL·E / ImageFX / Leonardo.
+ * They generate planner/journal DESIGN ASSETS.
+ */
+export function buildPlannerDesignImagePrompts(input: PromptInput) {
+  const base = `
+Design style: ${themeStyle(input.theme)}
+Color palette: ${colorPalette(input.colorPreset)}
+${fontVibe(input.font)}
+Paper/background: ${backgroundDesc(input.background)}
+Audience: ${input.audience}
+Product type: ${input.format}
+Occasion: ${input.occasion}
+Topics: ${list(input.topics)}
+Canvas: ${sizeSpec(input.size)}
+Rules: print-friendly, clean layout, lots of whitespace, no watermarks, no logos, no copyrighted brands
+`.trim();
+
+  // 1) FRONT COVER
+  const frontCoverPrompt = `
+Create a PRINTABLE FRONT COVER design for a planner/journal.
+${base}
+
+COMPOSITION:
+- Portrait cover, centered title area
+- Minimal decorative elements that match the theme
+- Include placeholder text EXACTLY:
+  Title: "${input.format}"
+  Subtitle: "${input.occasion} • ${input.theme} Edition"
+- Optional small motif related to topics: ${list(input.topics)}
+
+PRINT RULES:
+- High resolution, crisp lines, clean margins
+- No photos of real people, no busy textures
+${notesBlock(input.extraNotes)}
+`.trim();
+
+  // 2) BACK COVER
+  const backCoverPrompt = `
+Create a matching PRINTABLE BACK COVER design for the same planner/journal.
+${base}
+
+COMPOSITION:
+- Matching theme + palette to front cover
+- Very minimal
+- Include a small “About this planner” text block area as a placeholder (no actual text required)
+- Add a subtle border or corner accents (optional)
+
+PRINT RULES:
+- High resolution, clean margins, no watermarks
+${notesBlock(input.extraNotes)}
+`.trim();
+
+  // 3) INTERIOR PAGE TEMPLATE (DESIGN LOOK)
+  // This is the key: you want a prompt that produces a page layout *design*.
+  const interiorPageTemplatePrompt = `
+Create a PRINTABLE INTERIOR PAGE TEMPLATE design for a ${input.format}.
+${base}
+
+LAYOUT REQUIREMENTS (make it look like a real planner page):
+- Header area (date/week/month label area)
+- Section blocks and lines for writing space
+- A small sidebar area for notes or priorities
+- A minimal habit tracker mini-box (optional)
+- Use ${backgroundDesc(input.background)} very faintly so text remains readable
+- Keep accents subtle and minimal ink usage
+
+RULES:
+- No long paragraphs, no heavy fills
+- No watermarks, no logos
+${notesBlock(input.extraNotes)}
+`.trim();
+
+  // 4) DIVIDER PAGE (SECTION)
+  const dividerPagePrompt = `
+Create a PRINTABLE SECTION DIVIDER PAGE design for a planner/journal.
+${base}
+
+DIVIDER REQUIREMENTS:
+- Bold section title area with placeholder text:
+  "SECTION TITLE"
+- Decorative theme elements (very minimal)
+- Optional tab look on the side (subtle)
+- Clean whitespace and premium feel
+
+RULES:
+- No branding, no watermarks
+${notesBlock(input.extraNotes)}
+`.trim();
+
+  // 5) ICON / STICKER SHEET
+  const stickerSheetPrompt = `
+Create a PRINTABLE planner sticker sheet (icons) matching the same planner design.
+${base}
+
+CONTENT:
+- 30–50 small icons and labels styled consistently (minimal)
+- Include icons: calendar, checklist, habit, water, workout, meal, notes, goals, appointment, reminder, self-care
+- Add a few decorative mini elements matching the theme (tiny leaves, dots, stars, florals depending on theme)
+
+OUTPUT LOOK:
+- Sticker sheet layout on white background
+- Consistent stroke width, flat vector look, print-friendly
+
+RULES:
+- No watermark, no logos
+${notesBlock(input.extraNotes)}
+`.trim();
+
+  // 6) ETSY LISTING MOCKUP (OPTIONAL BUT HIGH VALUE)
+  const listingMockupPrompt = `
+Create an ETSY-STYLE PRODUCT MOCKUP image for a planner/journal listing.
+${base}
+
+SCENE:
+- Flat-lay desk scene or neutral tabletop
+- Show the planner cover as the hero item (front cover visible)
+- Add subtle props that match theme (pen, coffee cup, flowers for floral theme, etc.)
+- Soft natural lighting, minimal, premium
+
+RULES:
+- No brand names, no logos, no watermark
+- The cover design should match the front cover prompt style
+${notesBlock(input.extraNotes)}
+`.trim();
+
+  return {
+    frontCoverPrompt,
+    backCoverPrompt,
+    interiorPageTemplatePrompt,
+    dividerPagePrompt,
+    stickerSheetPrompt,
+    listingMockupPrompt
+  };
 }
