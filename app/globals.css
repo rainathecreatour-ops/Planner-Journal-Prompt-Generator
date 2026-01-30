@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: 255 255 255;
+}
+
+body {
+  background: rgb(var(--bg));
+}
+
+.bg-pattern {
+  background-repeat: repeat;
+  background-size: 260px 260px;
+}
