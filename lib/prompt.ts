@@ -12,40 +12,109 @@ type PromptInput = {
   extraNotes: string;
 };
 
-export function buildPrompt(input: PromptInput) {
-  const topicsLine = input.topics.length ? input.topics.join(", ") : "General";
-  const notes = input.extraNotes?.trim();
-
-  return `
-You are a professional planner & journal designer.
-
-Create a ${input.pages}-page ${input.format} for: ${input.audience}.
-Occasion: ${input.occasion}
-Theme: ${input.theme}
-Paper size: ${input.size}
-Background style: ${input.background}
-Font preference: ${input.font}
-Color preset: ${input.colorPreset}
-Topics to include: ${topicsLine}
-
-REQUIREMENTS:
-- Print-friendly (black text works; accent color used lightly)
-- Clean hierarchy: headings, subheadings, writing space
-- Include page variety (do not repeat the same layout too often)
-- Provide a clear page-by-page outline and the actual text for each page
-- Add 3 cover title ideas + subtitle ideas
-- Include 10 “bonus prompts” pages spread across the book (short writing prompts)
-
-OUTPUT FORMAT (IMPORTANT):
-Return JSON with keys:
-{
-  "coverIdeas": [{"title":"","subtitle":""}],
-  "styleGuide": {"fonts":"","colors":"","background":"","themeNotes":""},
-  "pages": [
-    {"pageNumber": 1, "title": "", "layout": "", "content": ""}
-  ]
+function list(items: string[]) {
+  return items.length ? items.join(", ") : "general productivity and wellness";
 }
 
-${notes ? `EXTRA NOTES:\n- ${notes}\n` : ""}
+function backgroundDesc(bg: string) {
+  if (bg === "grid") return "very subtle light gray grid paper pattern";
+  if (bg === "dots") return "very subtle evenly spaced dotted paper pattern";
+  if (bg === "lines") return "very subtle ruled lines paper pattern";
+  return "plain white paper background";
+}
+
+function themeStyle(theme: string) {
+  if (theme === "Boho") return "boho minimalist aesthetic, soft organic shapes, neutral textures";
+  if (theme === "Floral") return "minimal floral line art, soft botanical accents";
+  if (theme === "Luxury") return "luxury minimalist aesthetic, elegant spacing, subtle gold-style accents";
+  if (theme === "Cute") return "cute minimal aesthetic, rounded shapes, friendly soft style";
+  if (theme === "Modern") return "modern clean aesthetic, geometric accents, crisp lines";
+  return "minimal clean aesthetic with lots of white space";
+}
+
+function colorPalette(color: string) {
+  if (color === "lavender") return "lavender, soft lilac, white, light gray, charcoal text";
+  if (color === "tealGold") return "teal, warm cream, subtle gold accents, charcoal text";
+  if (color === "rose") return "rose, blush, white, light gray, charcoal text";
+  if (color === "forest") return "forest green, sage, warm cream, charcoal text";
+  return "black, white, light gray neutral palette";
+}
+
+function fontStyle(font: string) {
+  if (font === "playfair") return "elegant serif typography for headings with clean sans-serif body text";
+  if (font === "space") return "modern geometric typography with clean sans-serif body text";
+  return "clean modern sans-serif typography";
+}
+
+export function buildImagePrompts(input: PromptInput) {
+  const coverPrompt = `
+Create a high-resolution PRINTABLE planner cover design.
+
+STYLE:
+${themeStyle(input.theme)}
+Color palette: ${colorPalette(input.colorPreset)}
+Typography style: ${fontStyle(input.font)}
+
+CONTENT:
+Planner type: ${input.format}
+Occasion: ${input.occasion}
+Audience: ${input.audience}
+Topics: ${list(input.topics)}
+
+LAYOUT RULES:
+- Portrait orientation
+- Minimalist layout with generous white space
+- Centered title area
+- Decorative elements must be subtle and minimal
+- NO people, NO photos, NO logos, NO watermarks
+
+TEXT PLACEHOLDERS (exact text):
+Title: "${input.format}"
+Subtitle: "${input.occasion} • ${input.theme} Edition"
+
+PRINT QUALITY:
+- Clean edges
+- Professional printable look
+- White or very light background
 `.trim();
+
+  const interiorPrompt = `
+Create a seamless interior planner page background.
+
+BACKGROUND STYLE:
+${backgroundDesc(input.background)}
+Theme overlay: ${themeStyle(input.theme)}
+Color palette: ${colorPalette(input.colorPreset)}
+
+RULES:
+- Extremely subtle (must not affect readability)
+- No text, no words, no icons
+- Seamless / tileable pattern
+- Optimized for printing
+`.trim();
+
+  const iconsPrompt = `
+Create a cohesive set of 24 minimal planner icons.
+
+STYLE:
+${themeStyle(input.theme)}
+Color palette: ${colorPalette(input.colorPreset)}
+
+INCLUDE ICONS:
+calendar, checklist, habit tracker, heart, star, water cup, dumbbell, book, lightbulb,
+clock, shopping cart, meal, phone, envelope, location pin, smiley, moon, sun,
+flower, leaf, target, piggy bank, pen
+
+RULES:
+- Flat vector line icons
+- Consistent stroke width
+- No text, no branding, no watermark
+- Transparent background preferred
+`.trim();
+
+  return {
+    coverPrompt,
+    interiorPrompt,
+    iconsPrompt
+  };
 }
