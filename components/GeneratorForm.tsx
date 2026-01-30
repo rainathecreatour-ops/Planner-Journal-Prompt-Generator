@@ -28,21 +28,22 @@ export default function GeneratorForm() {
   const selectedBg = useMemo(() => BACKGROUNDS.find(b => b.value === background)!, [background]);
   const selectedColor = useMemo(() => COLOR_PRESETS.find(c => c.value === colorPreset)!, [colorPreset]);
 
-  const prompt = useMemo(() => {
-    return buildPrompt({
-      format,
-      occasion,
-      theme,
-      background,
-      font,
-      colorPreset,
-      topics,
-      audience,
-      pages,
-      size,
-      extraNotes
-    });
-  }, [format, occasion, theme, background, font, colorPreset, topics, audience, pages, size, extraNotes]);
+ const imagePrompts = useMemo(() => {
+  return buildImagePrompts({
+    format,
+    occasion,
+    theme,
+    background,
+    font,
+    colorPreset,
+    topics,
+    audience,
+    pages,
+    size,
+    extraNotes
+  });
+}, [format, occasion, theme, background, font, colorPreset, topics, audience, pages, size, extraNotes]);
+
 
   async function onGenerate() {
     setLoading(true);
